@@ -7,17 +7,39 @@
 			- 발급된 로또는 모두 출력됩니다. 
 		(3)로또 당첨번호가 나오면 발행했던 모든 로또와 비교하여 당첨통계를 출력해줍니다.
 	2. 변수지정 : 
-		- money : 금액을 변수로 지정
 		- lottoData : 로또의 정보를 가지고 있는 객체이다. 로또의 당첨 등수와 당첨등수에 맞는 금액,
 					  발행한 로또에서 해당 등수의 카운터의 정보를 가지고 있다. setLuckyNumber함수가
 					  호출되면 초기화하기 위해서 setLuckyNumber함수안에 객체를 생성하였다.
 		- lottoNumArr : 발행한 모든 로또번호를 배열로 저장합니다.
-		- setLottoNumber : 6개의 로또번호를 발행하는 함수입니다. 배열의 형태로 반환합니다.
+		- getLottoNumber : 6개의 로또번호를 발행하는 함수입니다. 배열의 형태로 반환합니다.
 		- buyLottos : 1000원당 한장에 로또를 발행하고 발행한 모든 로또번호를 출력하는 함수입니다.
 		- setLuckyNumber : 로또번호가 나오면 발행했던 함수와 모두 비교해서 당첨 통계와 수익률을 출력하는 함수입니다.
 */
+
+/*
+	* 객체 복사할 때 문제점.
+	객체를 복사할 때 = 을 사용하면 같은 값을 참조하므로 데이터를 변경할 때 원본과 사본이 함께 변경됩니다.
+	let a = {};
+	let b = {};
+	let c = {};
+	>> 이럴 때는 a,b,c 모두 다른 객체를 참조하고 있습니다.
+	a = b = c;
+	>> 이렇게 되면 같은 객체를 참조하게 됩니다.
+	
+	- JSON.stringify : parse 메소드는 string 객체를 json 객체로 변환시켜줍니다.
+	- JSON.parse : stringify 메소드는 json 객체를 String 객체로 변환시켜 줍니다.
+	
+	* 객체의 참조가 끊어질 때!!
+	- 객체가 JSON문자열로 바뀔 때 객체의 참조가 끊어집니다.
+*/
 let lottoNumArr = [];
-function setLottoNumber(){
+const lottoData = {
+	3 : {count : 0, price : 5000},
+	4 : {count : 0, price : 50000},
+	5 : {count : 0, price : 1500000},
+	6 : {count : 0, price : 2000000000}
+}
+function getLottoNumber(){
 	const lottoNumber = [];
 	let lottoNumLength = 6;
 	while(lottoNumber.length !== lottoNumLength){
@@ -31,46 +53,42 @@ function buyLottos(insertMoney){
 	let lottoCount = parseInt(insertMoney/1000);
 	this.insertMoney = insertMoney;
 	console.log('로또 ' + lottoCount + '개를 발행했습니다.');
-	
-	(function prodLotto(){	
-		for(let i = 0; i < lottoCount; i ++){
-			let lottoNum = setLottoNumber();
-			lottoNumArr.push(lottoNum);
-			console.log(lottoNum);
-		}
-	})()
+	repeatLottos(lottoCount);
 }
-function setLuckyNumber(luckyNumber){
-
-	const lottoData = {
-		3 : {count : 0, price : 5000},
-		4 : {count : 0, price : 50000},
-		5 : {count : 0, price : 1500000},
-		6 : {count : 0, price : 2000000000}
+function repeatLottos(lottoCount){
+	for(let i = 0; i < lottoCount; i++){
+		lottoNumArr.push(getLottoNumber());
+		console.log(getLottoNumber());
 	}
+}
+
+function setLuckyNumber(luckyNumber){
+	const copyLottoData = JSON.parse(JSON.stringify(lottoData));
 	for(let i = 0; i < lottoNumArr.length; i++){
 		let count = 0;
 		lottoNumArr[i].forEach(v=>{
 			if(luckyNumber.includes(v)) count++;
 		});
-		for(key in lottoData){
-			if(+key === count) lottoData[key].count++;
+		for(key in copyLottoData){
+			if(+key === count) copyLottoData[key].count++;
 		}
 	}
-	function printResult(){
-		console.log("당첨통계");
-		console.log("-------------");
-		for(let key in lottoData){
-			console.log(+key + "개 일치 " + "(" + lottoData[key].price + "원) - " + lottoData[key].count + "개");
-		}
-		let totalPrize = 0;
-		for(let key in lottoData){
-			totalPrize += lottoData[key].count * lottoData[key].price;
-		}
-		console.log("나의 수익률은 " + (totalPrize/insertMoney*100).toFixed(2) + "%입니다.");
-	}
-	printResult();
+	printResult(copyLottoData);
 	lottoNumArr = [];
+
+}
+
+function printResult(copyLottoData){
+	console.log("당첨통계");
+	console.log("-------------");
+	for(let key in copyLottoData){
+		console.log(`${+key}개 일치 (${copyLottoData[key].price}원) - ${copyLottoData[key].count}개`);
+	}
+	let totalPrize = 0;
+	for(let key in copyLottoData){
+		totalPrize += copyLottoData[key].count * copyLottoData[key].price;
+	}
+	console.log("나의 수익률은 " + (totalPrize/insertMoney*100).toFixed(2) + "%입니다.");
 }
 
 buyLottos(50000);
