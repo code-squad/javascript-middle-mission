@@ -25,7 +25,7 @@
 	>> 이럴 때는 a,b,c 모두 다른 객체를 참조하고 있습니다.
 	a = b = c;
 	>> 이렇게 되면 같은 객체를 참조하게 됩니다.
-	
+
 	- JSON.stringify : parse 메소드는 string 객체를 json 객체로 변환시켜줍니다.
 	- JSON.parse : stringify 메소드는 json 객체를 String 객체로 변환시켜 줍니다.
 	
@@ -49,19 +49,30 @@ function getLottoNumber(){
 	}
 	return lottoNumber;
 }
+
 function buyLottos(insertMoney){
 	let lottoCount = parseInt(insertMoney/1000);
 	this.insertMoney = insertMoney;
-	console.log('로또 ' + lottoCount + '개를 발행했습니다.');
 	repeatLottos(lottoCount);
 }
 function repeatLottos(lottoCount){
+	console.log('로또 ' + lottoCount + '개를 발행했습니다.');
 	for(let i = 0; i < lottoCount; i++){
 		lottoNumArr.push(getLottoNumber());
 		console.log(getLottoNumber());
 	}
 }
-
+/*	##setLuckyNumber함수 동작원리
+		1. 파라미터의 값으로 로또당첨번호를 받는다.
+		2. copyLottoData라는 발행한 로또의 번호중 당첨등수의 count와 당첨등수의 가격이 들어있는 정보를 복사한다. 
+			이유는 setLuckyNumber이라는 함수가 호출되어서 당첨통계를 출력하면 로또데이터를 초기화하기위함이다.
+			또 객체를 복사할 때 조심해야할 것이 그 객체 자체가 복사되는게 아니라 참조하는 값이 같아지기 때문에 
+			참조를 끊어서 복사하는 것이 중요하다!
+		3. lottoNumArr의 발행한 로또 길이만큼 for문을 사용하여 반복한다.
+		4. 임의의 count값을 설정하고 발행한 로또번호와 당첨번호를 비교하여 일치하는 게 있을 때마다 count 값을 증가시킨다.
+		5. 로또데이터를 복사한 copyLottoData의 key값과 count값을 비교하여 일치하면 copyLottoData객체의 key의 count 값을 증가시킨다.
+		6. 당첨통계를 printResult함수를 통해 호출한다. 
+*/
 function setLuckyNumber(luckyNumber){
 	const copyLottoData = JSON.parse(JSON.stringify(lottoData));
 	for(let i = 0; i < lottoNumArr.length; i++){
@@ -75,17 +86,14 @@ function setLuckyNumber(luckyNumber){
 	}
 	printResult(copyLottoData);
 	lottoNumArr = [];
-
 }
 
 function printResult(copyLottoData){
+	let totalPrize = 0;
 	console.log("당첨통계");
 	console.log("-------------");
 	for(let key in copyLottoData){
 		console.log(`${+key}개 일치 (${copyLottoData[key].price}원) - ${copyLottoData[key].count}개`);
-	}
-	let totalPrize = 0;
-	for(let key in copyLottoData){
 		totalPrize += copyLottoData[key].count * copyLottoData[key].price;
 	}
 	console.log("나의 수익률은 " + (totalPrize/insertMoney*100).toFixed(2) + "%입니다.");
