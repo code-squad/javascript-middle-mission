@@ -11,7 +11,7 @@
 					  발행한 로또에서 해당 등수의 카운터의 정보를 가지고 있다. setLuckyNumber함수가
 					  호출되면 초기화하기 위해서 setLuckyNumber함수안에 객체를 생성하였다.
 		- lottoNumArr : 발행한 모든 로또번호를 배열로 저장합니다.
-		- getLottoNumber : 6개의 로또번호를 발행하는 함수입니다. 배열의 형태로 반환합니다.
+		- makeLottoNumber : 6개의 로또번호를 발행하는 함수입니다. 배열의 형태로 반환합니다.
 		- buyLottos : 1000원당 한장에 로또를 발행하고 발행한 모든 로또번호를 출력하는 함수입니다.
 		- setLuckyNumber : 로또번호가 나오면 발행했던 함수와 모두 비교해서 당첨 통계와 수익률을 출력하는 함수입니다.
 */
@@ -32,14 +32,13 @@
 	* 객체의 참조가 끊어질 때!!
 	- 객체가 JSON문자열로 바뀔 때 객체의 참조가 끊어집니다.
 */
-let lottoNumArr = [];
 const lottoData = {
 	3 : {count : 0, price : 5000},
 	4 : {count : 0, price : 50000},
 	5 : {count : 0, price : 1500000},
 	6 : {count : 0, price : 2000000000}
 }
-function getLottoNumber(){
+function makeLottoNumber(){
 	const lottoNumber = [];
 	let lottoNumLength = 6;
 	while(lottoNumber.length !== lottoNumLength){
@@ -50,16 +49,18 @@ function getLottoNumber(){
 	return lottoNumber;
 }
 
-function buyLottos(insertMoney){
+function makeMyLotto(insertMoney){
+	const lottoNumArr = [];
 	let lottoCount = parseInt(insertMoney/1000);
 	this.insertMoney = insertMoney;
-	repeatLottos(lottoCount);
+	addMyLottos(lottoCount, lottoNumArr);
+	return lottoNumArr;
 }
-function repeatLottos(lottoCount){
+function addMyLottos(lottoCount, lottoNumArr){
 	console.log('로또 ' + lottoCount + '개를 발행했습니다.');
 	for(let i = 0; i < lottoCount; i++){
-		lottoNumArr.push(getLottoNumber());
-		console.log(getLottoNumber());
+		lottoNumArr.push(makeLottoNumber());
+		console.log(makeLottoNumber());
 	}
 }
 /*	##setLuckyNumber함수 동작원리
@@ -73,11 +74,11 @@ function repeatLottos(lottoCount){
 		5. 로또데이터를 복사한 copyLottoData의 key값과 count값을 비교하여 일치하면 copyLottoData객체의 key의 count 값을 증가시킨다.
 		6. 당첨통계를 printResult함수를 통해 호출한다. 
 */
-function setLuckyNumber(luckyNumber){
+function setLuckyNumber(luckyNumber, myLottos){
 	const copyLottoData = JSON.parse(JSON.stringify(lottoData));
-	for(let i = 0; i < lottoNumArr.length; i++){
+	for(let i = 0; i < myLottos.length; i++){
 		let count = 0;
-		lottoNumArr[i].forEach(v=>{
+		myLottos[i].forEach(v=>{
 			if(luckyNumber.includes(v)) count++;
 		});
 		for(key in copyLottoData){
@@ -85,7 +86,6 @@ function setLuckyNumber(luckyNumber){
 		}
 	}
 	printResult(copyLottoData);
-	lottoNumArr = [];
 }
 
 function printResult(copyLottoData){
@@ -96,11 +96,10 @@ function printResult(copyLottoData){
 		console.log(`${+key}개 일치 (${copyLottoData[key].price}원) - ${copyLottoData[key].count}개`);
 		totalPrize += copyLottoData[key].count * copyLottoData[key].price;
 	}
-	console.log("나의 수익률은 " + (totalPrize/insertMoney*100).toFixed(2) + "%입니다.");
+	let result = (totalPrize/insertMoney*100).toFixed(2);
+	console.log(`나의 수익률은 ${result}%입니다.`);
 }
 
-buyLottos(50000);
-setLuckyNumber([1,2,3,4,5,6]);
-buyLottos(50000);
-setLuckyNumber([11,12,13,14,15,16]);
+setLuckyNumber([1,2,3,4,5,6], makeMyLotto(50000));
+setLuckyNumber([11,12,13,14,15], makeMyLotto(50000));
 </script>
