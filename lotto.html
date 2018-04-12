@@ -17,7 +17,7 @@
 			- loopCount : 1000원당 한장을 발행하는데 발행하는 수를 반환합니다.
 			- makeMyLottos : 돈을 넣은만큼 로또를 만들어줍니다.
 			- printMyLotto : 발행한 모든 로또를 출력해줍니다.
-			- checkLottoWinning : 당첨번호와 나의 로또번호를 비교하여 당첨된 로또데이터를 반환합니다.
+			- confirmLottoWinning : 당첨번호와 나의 로또번호를 비교하여 당첨된 로또데이터를 반환합니다.
 			- printLottoWinning : 당첨된 로또데이터를 토대로 당첨통계를 출력합니다.
 		(4) buyLottos : 금액을 넣으면 1000원에 한장에 로또를 발행하고 출력합니다.
 		(5) setLuckyNumber : 당첨번호가 나오면 내 로또번호와 비교하여 당첨통계를 출력합니다.
@@ -45,7 +45,20 @@ const lottoData = {
 	5 : {count : 0, price : 1500000},
 	6 : {count : 0, price : 2000000000}
 }
-let pipe = (...fns) => (value) => fns.reduce((acc, fn) => fn.call(lottoObject, acc), value);
+/*
+	## pipe함수
+	function pipe(...fns){
+		return function (value){
+			return ...(func3(func2(func1(value))))
+		}
+	}
+	우선 pipe함수에서 인자값으로 함수를 받는다. 첫번째 인자부터 순서대로 함수가 호출된다.
+	첫번째 인자의 함수가 호출되고 함수의 반환값이 두번째 함수의 인자값으로 들어가고 호출되고 반환값이 세번째 함수의 인자값 이렇게 반복된다.
+	그렇게 잘게 나누어진 함수들을 합쳐서 쓸 수가 있다.
+	그리고 pipe함수가 window에 있기 때문에 pipe함수를 호출할 때 lottoObject객체 내에서 this가 lottoObject객체를 가리키지않고
+	window를 가리켜서 당황을 했다. this를 써야하나 고민을 했었는데 call을 써서 window가 아니라 원하는 호출context를 정할 수 있었다.
+*/
+let pipe = (...fns) => (objName, value) => fns.reduce((acc, fn) => fn.call(objName, acc), value);
 
 let lottoObject = {
 	insertMoney : 0,
@@ -64,31 +77,27 @@ let lottoObject = {
 	},
 	makeMyLottos(count){
 
-		let myLottos = [];
-		for(let i = 0; i < count; i++){
-			myLottos.push(this.createLotto());
-		}
+		let myLottos = [...Array(count)].map(v=>this.createLotto());
 		this.myLottos = myLottos;
 		return myLottos;
 	},
 	printMyLotto(myLottos){
 
 		console.log(`${myLottos.length}개의 로또를 발행했습니다.`);
-		for(let i = 0; i < myLottos.length; i++){
-			console.log(myLottos[i]);
-		}
+
+		myLottos.forEach(v=>{ console.log(v) })
 	},
-	checkLottoWinning(luckyNumber){
+	confirmLottoWinning(luckyNumber){
 		const copyLottoData = JSON.parse(JSON.stringify(lottoData));
-		for(let i = 0; i < this.myLottos.length; i++){
+		this.myLottos.forEach(v=>{
 			let count = 0;
-			this.myLottos[i].forEach(v=>{
-				if(luckyNumber.includes(v)) count++;
+			v.forEach(value =>{
+				if(luckyNumber.includes(value)) count++;
 			});
 			for(key in copyLottoData){
 				if(+key === count) copyLottoData[key].count++;
 			}
-		}
+		})
 		return copyLottoData;
 	},
 	printLottoWinning(winningData){
@@ -106,8 +115,8 @@ let lottoObject = {
 }
 
 let buyLottos = pipe(lottoObject.loopCount, lottoObject.makeMyLottos, lottoObject.printMyLotto);
-let setLuckyNumber = pipe(lottoObject.checkLottoWinning, lottoObject.printLottoWinning);
+let setLuckyNumber = pipe(lottoObject.confirmLottoWinning, lottoObject.printLottoWinning);
 
-buyLottos(50000);
-setLuckyNumber([1,2,3,4,5,6]);
+buyLottos(lottoObject,50000);
+setLuckyNumber(lottoObject, [1,2,3,4,5,6]);
 </script>
