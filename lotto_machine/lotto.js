@@ -27,6 +27,12 @@ function buyLotto(money) {
 
 // 로또 번호 생성 함수
 function createLottoNum() {
+  let lottoNumber = [];
+  for (let i = 0; i < 6; i++) {
+    let createNum = Math.floor(Math.random() * 45) + 1;
+    lottoNumber.push(createNum);
+  }
+  return lottoNumber;
 }
 
 // 생성된 로또함수와 내가 입력한 로또함수 비교 함수
