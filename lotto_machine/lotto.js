@@ -12,14 +12,21 @@
 4. 비교되어 맞는 로또 번호의 개수(1~6까지)에 따라 당첨 금액 출력
 */ 
 
-// 로또 구매 함수
-function buyLotto() {
+const noticeMSG = {
+  shortMoney: "구매 금액이 부족합니다.",
+};
 
+// 로또 구매 함수
+function buyLotto(money) {
+  // 해당 금액에 따라 로또 매수 구매
+  if(money < 1000) return noticeMSG.shortMoney; 
+
+  let createLottoNumber = createLottoNum();
+  return createLottoNumber;
 }
 
 // 로또 번호 생성 함수
 function createLottoNum() {
-  
 }
 
 // 생성된 로또함수와 내가 입력한 로또함수 비교 함수
@@ -31,3 +38,6 @@ function setLuckyNum(myLuckyNum) {
 function winningLottoNum() {
   
 }
+
+console.log(buyLotto(900));
+console.log(buyLotto(1000));
