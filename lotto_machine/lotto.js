@@ -104,7 +104,18 @@ function calculateYield(count, lottoTickets, winLottos){
   benefits += winLottos[5] * 1500000;
   benefits += winLottos[6] * 2000000000;
   let margin = Math.floor((benefits / investment) * 100);
-  return margin;
+  showWinningLotto(winLottos, margin, investment, benefits);
+}
+
+// 비교된 숫자 개수에 따라 당첨 사항 출력 함수
+function showWinningLotto(winLottoTickets, margin, investment, benefits) {
+  console.log(noticeMSG.matchNumThree + winLottoTickets[3] + "개");
+  console.log(noticeMSG.matchNumFour + winLottoTickets[4] + "개");
+  console.log(noticeMSG.matchNumFive + winLottoTickets[5] + "개");
+  console.log(noticeMSG.matchNumSix + winLottoTickets[6] + "개");
+
+  console.log("나의 투자금액은 " + investment + "이고 이익금은 " + benefits + "입니다.");
+  console.log("나의 수익률은 " + margin +"% 입니다.");
 }
 
 
