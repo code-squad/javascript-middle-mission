@@ -92,8 +92,20 @@ function checkLuckyNum(myLuckyNum, lottoTickets) {
     }
     winLottos[count] += 1;
   });
+  calculateYield(count, lottoTickets, winLottos);
 }
 
+// 투자금, 이익금, 수익률 계산 함수
+function calculateYield(count, lottoTickets, winLottos){
+  let investment = lottoTickets.length * 1000;
+  let benefits = 0;
+  benefits += winLottos[3] * 5000;
+  benefits += winLottos[4] * 50000;
+  benefits += winLottos[5] * 1500000;
+  benefits += winLottos[6] * 2000000000;
+  let margin = Math.floor((benefits / investment) * 100);
+  return margin;
+}
 
 
 // console.log(buyLotto(900)); // 구매 금액이 부족합니다.
